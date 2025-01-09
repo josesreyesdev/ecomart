@@ -1,5 +1,9 @@
 package com.jsrdev.ecomart.controller;
 
+import com.knuddels.jtokkit.Encodings;
+import com.knuddels.jtokkit.api.Encoding;
+import com.knuddels.jtokkit.api.EncodingRegistry;
+import com.knuddels.jtokkit.api.ModelType;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.ChatOptionsBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,6 +44,9 @@ public class ProductCategorizationController {
                         Respuesta: Deportes
                 """;
 
+        var tokens = counterTokens(system, product);
+        System.out.println("Tokens: "+ tokens);
+
         return this.chatClient.prompt()
                 .system(system)
                 .user(product)
@@ -50,4 +57,13 @@ public class ProductCategorizationController {
                 .call()
                 .content();
     }
+
+    private int counterTokens(String system, String user) {
+        EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
+        Encoding enc = registry.getEncodingForModel(ModelType.GPT_4O_MINI);
+
+        return enc.countTokens(system + user);
+    }
+
+
 }
